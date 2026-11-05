@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "groups": [
+    {
+      "id": "foundations",
+      "label": "Foundations"
+    },
+    {
+      "id": "harness",
+      "label": "Practice"
+    },
+    {
+      "id": "docs",
+      "label": "Reference docs"
+    }
+  ],
+  "items": [
+    {
+      "id": "anthropic-agents",
+      "group": "foundations",
+      "title": "Building effective agents",
+      "publisher": "Anthropic",
+      "year": 2024,
+      "url": "https://www.anthropic.com/engineering/building-effective-agents",
+      "about": "The workflow vs. agent distinction, and the simple patterns that work in production."
+    },
+    {
+      "id": "anthropic-context",
+      "group": "foundations",
+      "title": "Effective context engineering for AI agents",
+      "publisher": "Anthropic",
+      "year": 2025,
+      "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "about": "What goes into the context window, and how to keep it useful over a long task."
+    },
+    {
+      "id": "anthropic-tools",
+      "group": "foundations",
+      "title": "Writing effective tools for agents",
+      "publisher": "Anthropic",
+      "year": 2025,
+      "url": "https://www.anthropic.com/engineering/writing-tools-for-agents",
+      "about": "How tool names, descriptions and results shape what an agent can do."
+    },
+    {
+      "id": "openai-harness",
+      "group": "harness",
+      "title": "Harness engineering: leveraging Codex in an agent-first world",
+      "publisher": "OpenAI",
+      "year": 2026,
+      "url": "https://openai.com/index/harness-engineering/",
+      "about": "Constraints, feedback loops and garbage collection from a codebase written entirely by agents."
+    },
+    {
+      "id": "fowler-harness",
+      "group": "harness",
+      "title": "Harness engineering for coding agent users",
+      "publisher": "martinfowler.com",
+      "year": 2026,
+      "url": "https://martinfowler.com/articles/harness-engineering.html",
+      "about": "Guides that steer the agent and sensors that check its work: the framing behind the G and S tags."
+    },
+    {
+      "id": "fowler-context",
+      "group": "harness",
+      "title": "Context engineering for coding agents",
+      "publisher": "martinfowler.com",
+      "year": 2026,
+      "url": "https://martinfowler.com/articles/exploring-gen-ai/context-engineering-coding-agents.html",
+      "about": "Which context reaches a coding agent, who decides to load it, and when."
+    },
+    {
+      "id": "claude-bp",
+      "group": "docs",
+      "title": "Claude Code: best practices for agentic coding",
+      "publisher": "Anthropic",
+      "year": 2025,
+      "url": "https://www.anthropic.com/engineering/claude-code-best-practices",
+      "about": "CLAUDE.md, tool allowlists, worktrees and working loops in practice."
+    },
+    {
+      "id": "claude-memory",
+      "group": "docs",
+      "title": "Claude Code memory",
+      "publisher": "Claude Code docs",
+      "url": "https://code.claude.com/docs/en/memory",
+      "about": "How CLAUDE.md and memory files are found and loaded."
+    },
+    {
+      "id": "claude-hooks",
+      "group": "docs",
+      "title": "Claude Code hooks reference",
+      "publisher": "Claude Code docs",
+      "url": "https://docs.anthropic.com/en/docs/claude-code/hooks",
+      "about": "Hook events, and how a hook blocks a tool call or feeds output back."
+    },
+    {
+      "id": "claude-subagents",
+      "group": "docs",
+      "title": "Subagents in the Claude Agent SDK",
+      "publisher": "Claude Code docs",
+      "url": "https://code.claude.com/docs/en/agent-sdk/sub-agents",
+      "about": "Separate context windows for focused subtasks."
+    },
+    {
+      "id": "agents-md",
+      "group": "docs",
+      "title": "AGENTS.md",
+      "publisher": "agents.md",
+      "url": "https://agents.md",
+      "about": "The open format for project instructions read by coding agents."
+    },
+    {
+      "id": "mcp",
+      "group": "docs",
+      "title": "Model Context Protocol",
+      "publisher": "modelcontextprotocol.io",
+      "url": "https://modelcontextprotocol.io",
+      "about": "The open standard for exposing external tools and data to agents."
+    },
+    {
+      "id": "codex-sandbox",
+      "group": "docs",
+      "title": "Codex sandboxing and approvals",
+      "publisher": "OpenAI docs",
+      "url": "https://learn.chatgpt.com/codex/sandboxing",
+      "about": "Sandbox limits and approval modes for agent commands."
+    }
+  ]
+}

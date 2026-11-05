@@ -1,0 +1,931 @@
+{
+  "version": 2,
+  "blocks": {
+    "human": {
+      "label": "Human",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "The developer. Assigns the task, approves risky actions, reviews the pull request, and can step in at any point.",
+        "example": "Approves the push, then asks for different copy in review."
+      }
+    },
+    "task": {
+      "label": "Task",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "What starts the loop: an issue, a ticket, or a typed prompt. It becomes the first message in the context window.",
+        "example": "Issue #482, with its stack trace."
+      }
+    },
+    "context": {
+      "label": "Context window",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 382,
+      "h": 142,
+      "parts": [
+        "cx_system",
+        "cx_tooldefs",
+        "cx_instr",
+        "cx_skills",
+        "cx_history",
+        "cx_results"
+      ],
+      "info": {
+        "summary": "Everything the model sees on a turn, and the only thing it sees. Anything meant to influence the model has to get in here.",
+        "source": "anthropic-context"
+      }
+    },
+    "cx_system": {
+      "label": "System prompt",
+      "kind": "part",
+      "in": "context",
+      "info": {
+        "summary": "The agent's built-in instructions: how to behave and how to use the tools.",
+        "example": "Never run destructive commands without asking."
+      }
+    },
+    "cx_tooldefs": {
+      "label": "Tool definitions",
+      "kind": "part",
+      "in": "context",
+      "info": {
+        "summary": "The name, description and input schema of every tool the model may call. A vague description leads to a misused tool.",
+        "example": "`grep`: search file contents by pattern. Inputs: pattern, path.",
+        "source": "anthropic-tools"
+      }
+    },
+    "cx_instr": {
+      "label": "Project instructions",
+      "kind": "part",
+      "in": "context",
+      "info": {
+        "summary": "`AGENTS.md` or `CLAUDE.md`, loaded at the start of a session: how to build and test, and what to avoid.",
+        "example": "Run `pnpm test`. Add no new dependencies.",
+        "source": "agents-md"
+      },
+      "role": {
+        "type": "guide",
+        "method": "inferential"
+      }
+    },
+    "cx_skills": {
+      "label": "Loaded skills",
+      "kind": "part",
+      "in": "context",
+      "info": {
+        "summary": "Packaged instructions. Only a short description of each skill sits in context; the full instructions load when a task needs them.",
+        "example": "The `add-export-route` skill, loaded for the CSV ticket."
+      },
+      "role": {
+        "type": "guide",
+        "method": "inferential"
+      }
+    },
+    "cx_history": {
+      "label": "Conversation history",
+      "kind": "part",
+      "in": "context",
+      "info": {
+        "summary": "Every earlier message in the session: the task, the model's replies, tool calls, and human comments."
+      }
+    },
+    "cx_results": {
+      "label": "Tool results",
+      "kind": "part",
+      "in": "context",
+      "info": {
+        "summary": "The output of each tool call, added after the call. This is how the model learns what happened.",
+        "example": "`grep`: 3 callers of `formatEmailDomain()`."
+      }
+    },
+    "memory": {
+      "label": "Memory files",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "Notes kept on disk between sessions. Loaded into context at the start; the agent updates them through a tool.",
+        "example": "Saved: empty email shows \"No email on file\".",
+        "source": "claude-memory"
+      },
+      "role": {
+        "type": "guide",
+        "method": "inferential"
+      }
+    },
+    "llm": {
+      "label": "LLM",
+      "kind": "core",
+      "x": 0,
+      "y": 0,
+      "w": 160,
+      "h": 160,
+      "info": {
+        "summary": "The model. One input, the context window; one output, text and tool calls. It runs nothing itself.",
+        "example": "Replies: read `ProfileCard.tsx`, then `grep email.domain`.",
+        "source": "anthropic-context"
+      }
+    },
+    "loop": {
+      "label": "Agent loop",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 382,
+      "h": 142,
+      "parts": [
+        "lp_assemble",
+        "lp_compact",
+        "lp_hooks",
+        "lp_todo",
+        "lp_checkpoint",
+        "lp_stop"
+      ],
+      "info": {
+        "summary": "The agent's runtime, and the hub. It builds the context, calls the model, runs the tool calls, adds the results, and decides when to stop.",
+        "example": "One turn: call the model, run its two tool calls, add the results, call it again.",
+        "source": "anthropic-agents"
+      }
+    },
+    "lp_assemble": {
+      "label": "Context assembly",
+      "kind": "part",
+      "in": "loop",
+      "info": {
+        "summary": "Builds each turn's context from the system prompt, instructions, memory, history and tool results."
+      }
+    },
+    "lp_compact": {
+      "label": "Compaction",
+      "kind": "part",
+      "in": "loop",
+      "info": {
+        "summary": "When the context nears its limit, older turns are summarized to make room. Detail can be lost.",
+        "example": "Early exploration condensed into one paragraph.",
+        "source": "anthropic-context"
+      }
+    },
+    "lp_hooks": {
+      "label": "Hooks",
+      "kind": "part",
+      "in": "loop",
+      "info": {
+        "summary": "Scripts the agent loop runs on events, such as before a tool call or after an edit. A hook can block the call, or feed its output back to the model.",
+        "example": "After each edit: `tsc --noEmit`.",
+        "source": "claude-hooks"
+      }
+    },
+    "lp_todo": {
+      "label": "Todo list",
+      "kind": "part",
+      "in": "loop",
+      "info": {
+        "summary": "A plan the model keeps up to date through a tool, so the human can follow along and redirect.",
+        "example": "1. Null-safe helper  2. Hide the row  3. Add a test"
+      }
+    },
+    "lp_checkpoint": {
+      "label": "Checkpoints",
+      "kind": "part",
+      "in": "loop",
+      "info": {
+        "summary": "Snapshots of the files before edits, so a bad change can be rolled back.",
+        "example": "Rolled back after the architecture check failed."
+      }
+    },
+    "lp_stop": {
+      "label": "Stop conditions",
+      "kind": "part",
+      "in": "loop",
+      "info": {
+        "summary": "When the loop ends: the task is done, or a limit is hit, such as maximum turns, cost or retries.",
+        "example": "After 3 failed attempts, it stops and reports back."
+      }
+    },
+    "gate": {
+      "label": "Permission gate",
+      "kind": "gate",
+      "x": 0,
+      "y": 0,
+      "w": 382,
+      "h": 74,
+      "parts": [
+        "g_rules",
+        "g_ask"
+      ],
+      "info": {
+        "summary": "Checks every tool call before it runs. Allowed calls run, some wait for a human, and a denial goes back to the model as a tool result.",
+        "source": "codex-sandbox"
+      }
+    },
+    "g_rules": {
+      "label": "Permission rules",
+      "kind": "part",
+      "in": "gate",
+      "info": {
+        "summary": "Allow, ask and deny rules for each tool, set by the user or the project.",
+        "example": "Allow: read, `grep`. Ask: `git push`. Deny: `rm -rf`.",
+        "source": "claude-bp"
+      }
+    },
+    "g_ask": {
+      "label": "Approval prompts",
+      "kind": "part",
+      "in": "gate",
+      "info": {
+        "summary": "Calls that need a person wait here until approved or rejected.",
+        "example": "`git push origin fix/482`: approve?"
+      }
+    },
+    "tools": {
+      "label": "Tools",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 382,
+      "h": 210,
+      "parts": [
+        "t_read",
+        "t_edit",
+        "t_search",
+        "t_shell",
+        "t_web",
+        "t_mcp",
+        "t_subagent",
+        "t_lsp",
+        "t_codemod"
+      ],
+      "info": {
+        "summary": "What the agent can do. The model requests a call; the agent loop runs it and adds the result to the context window.",
+        "source": "anthropic-tools"
+      }
+    },
+    "t_read": {
+      "label": "Read file",
+      "kind": "part",
+      "in": "tools",
+      "info": {
+        "summary": "Returns a file's contents.",
+        "example": "`ProfileCard.tsx`, lines 30 to 60."
+      }
+    },
+    "t_edit": {
+      "label": "Edit file",
+      "kind": "part",
+      "in": "tools",
+      "info": {
+        "summary": "Writes a change to a file in the working tree.",
+        "example": "`formatEmailDomain()` now returns null for a missing email."
+      }
+    },
+    "t_search": {
+      "label": "Search code",
+      "kind": "part",
+      "in": "tools",
+      "info": {
+        "summary": "Finds usages and files across the repo, with `grep` and glob.",
+        "example": "`grep email.domain`: 3 matches."
+      }
+    },
+    "t_shell": {
+      "label": "Run shell command",
+      "kind": "part",
+      "in": "tools",
+      "info": {
+        "summary": "Runs a command in the environment: tests, builds, `git` and other CLIs.",
+        "example": "`gh run view --log-failed`"
+      }
+    },
+    "t_web": {
+      "label": "Web fetch",
+      "kind": "part",
+      "in": "tools",
+      "info": {
+        "summary": "Fetches a web page or document the task needs, if network access is allowed.",
+        "example": "The date-lib v3 migration guide."
+      }
+    },
+    "t_mcp": {
+      "label": "MCP tools",
+      "kind": "part",
+      "in": "tools",
+      "info": {
+        "summary": "Tools that external systems expose through the Model Context Protocol.",
+        "example": "Query error tracking for new issues since the deploy.",
+        "source": "mcp"
+      }
+    },
+    "t_subagent": {
+      "label": "Spawn subagent",
+      "kind": "part",
+      "in": "tools",
+      "info": {
+        "summary": "Starts a subagent with its own context window and a narrower task.",
+        "example": "Search `src/admin/` for callers.",
+        "source": "claude-subagents"
+      }
+    },
+    "t_lsp": {
+      "label": "Language server",
+      "kind": "part",
+      "in": "tools",
+      "info": {
+        "summary": "Type-aware actions from the language server: definitions, references, rename, extract function.",
+        "example": "Go to definition: `exportCustomersCsv`."
+      },
+      "role": {
+        "type": "guide",
+        "method": "computational"
+      }
+    },
+    "t_codemod": {
+      "label": "Codemods",
+      "kind": "part",
+      "in": "tools",
+      "info": {
+        "summary": "Scripted transforms that change many files in exactly the same way.",
+        "example": "String SQL rewritten to `qb.select()` in 3 files."
+      },
+      "role": {
+        "type": "guide",
+        "method": "computational"
+      }
+    },
+    "subagent": {
+      "label": "Subagents",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "Separate agents, each with its own context window. They return a short summary, which keeps the main context clean.",
+        "example": "Its summary said no other callers. It missed one, and the type check caught it.",
+        "source": "claude-subagents"
+      }
+    },
+    "env": {
+      "label": "Environment",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 382,
+      "h": 142,
+      "parts": [
+        "e_worktree",
+        "e_branch",
+        "e_image",
+        "e_sandbox",
+        "e_deps",
+        "e_devserver"
+      ],
+      "info": {
+        "summary": "Where tool calls run: an isolated copy of the repo with its own branch, runtime and limits.",
+        "source": "claude-bp"
+      }
+    },
+    "e_worktree": {
+      "label": "Worktree",
+      "kind": "part",
+      "in": "env",
+      "info": {
+        "summary": "A second checkout of the same repo, used only for this task.",
+        "source": "claude-bp"
+      }
+    },
+    "e_branch": {
+      "label": "Git branch",
+      "kind": "part",
+      "in": "env",
+      "info": {
+        "summary": "The branch the change lives on, kept apart from main until merged."
+      }
+    },
+    "e_image": {
+      "label": "Container image",
+      "kind": "part",
+      "in": "env",
+      "info": {
+        "summary": "The fixed runtime: operating system, language and tool versions.",
+        "example": "Node 22 and pnpm 9, while CI also tests Node 20."
+      }
+    },
+    "e_sandbox": {
+      "label": "Sandbox",
+      "kind": "part",
+      "in": "env",
+      "info": {
+        "summary": "Operating-system limits on which files, network and processes a command can reach.",
+        "example": "Writes only inside the worktree; network off.",
+        "source": "codex-sandbox"
+      }
+    },
+    "e_deps": {
+      "label": "Dependencies",
+      "kind": "part",
+      "in": "env",
+      "info": {
+        "summary": "The packages installed for this worktree."
+      }
+    },
+    "e_devserver": {
+      "label": "Dev server",
+      "kind": "part",
+      "in": "env",
+      "info": {
+        "summary": "A long-running process the agent can test its change against.",
+        "example": "`localhost:3000`, screenshotted at three widths."
+      }
+    },
+    "codebase": {
+      "label": "Codebase",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "The repository: the working tree the edits land in, and its `git` history."
+      }
+    },
+    "sensors": {
+      "label": "Sensors",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 382,
+      "h": 176,
+      "parts": [
+        "s_tests",
+        "s_lint",
+        "s_types",
+        "s_arch",
+        "s_semgrep",
+        "s_review",
+        "s_judge"
+      ],
+      "info": {
+        "summary": "Checks that report on a change after it is made. Their output reaches the model as tool results or hook output.",
+        "example": "The type check fails, and the agent fixes the caller it missed.",
+        "source": "fowler-harness"
+      }
+    },
+    "s_tests": {
+      "label": "Tests",
+      "kind": "part",
+      "in": "sensors",
+      "info": {
+        "summary": "Unit and integration tests. The most direct check that behaviour is right."
+      },
+      "role": {
+        "type": "sensor",
+        "method": "computational"
+      }
+    },
+    "s_lint": {
+      "label": "Linters",
+      "kind": "part",
+      "in": "sensors",
+      "info": {
+        "summary": "Static rules for style and common bugs. A good lint message includes the fix, so the agent knows what to change.",
+        "example": "`no-server-import`: move this into shared/.",
+        "source": "openai-harness"
+      },
+      "role": {
+        "type": "sensor",
+        "method": "computational"
+      }
+    },
+    "s_types": {
+      "label": "Type checks",
+      "kind": "part",
+      "in": "sensors",
+      "info": {
+        "summary": "The compiler's type check.",
+        "example": "`UserTable.tsx:88`: string expected, got null."
+      },
+      "role": {
+        "type": "sensor",
+        "method": "computational"
+      }
+    },
+    "s_arch": {
+      "label": "Architecture checks",
+      "kind": "part",
+      "in": "sensors",
+      "info": {
+        "summary": "Rules about structure, such as layers and forbidden imports, enforced as checks instead of review comments.",
+        "example": "Client code may not import server modules.",
+        "source": "openai-harness"
+      },
+      "role": {
+        "type": "sensor",
+        "method": "computational"
+      }
+    },
+    "s_semgrep": {
+      "label": "Semgrep",
+      "kind": "part",
+      "in": "sensors",
+      "info": {
+        "summary": "Pattern rules for security issues and common bugs.",
+        "example": "SQL built by string concatenation."
+      },
+      "role": {
+        "type": "sensor",
+        "method": "computational"
+      }
+    },
+    "s_review": {
+      "label": "Review agent",
+      "kind": "part",
+      "in": "sensors",
+      "info": {
+        "summary": "A separate model that reviews the diff for problems rules cannot catch.",
+        "example": "Found nothing wrong, though a column was missing."
+      },
+      "role": {
+        "type": "sensor",
+        "method": "inferential"
+      }
+    },
+    "s_judge": {
+      "label": "LLM as judge",
+      "kind": "part",
+      "in": "sensors",
+      "info": {
+        "summary": "A model that scores output against a rubric.",
+        "example": "Does the PR description match the diff?"
+      },
+      "role": {
+        "type": "sensor",
+        "method": "inferential"
+      }
+    },
+    "ci": {
+      "label": "CI pipeline",
+      "kind": "ext",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "The same checks on a clean remote machine, triggered by the pull request. The agent reads its logs through a CLI.",
+        "example": "Fails on Node 20 only; the container uses Node 22."
+      },
+      "role": {
+        "type": "sensor",
+        "method": "computational"
+      }
+    },
+    "pr": {
+      "label": "Pull request",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "The reviewable unit: the branch proposed for merge. Opening it triggers CI and a human review."
+      }
+    },
+    "gc": {
+      "label": "Garbage collection",
+      "kind": "block",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "Scheduled agent runs, separate from any task, that scan for drift and open small fix PRs.",
+        "example": "A PR removing one unused import.",
+        "source": "openai-harness"
+      },
+      "role": {
+        "type": "sensor",
+        "method": "inferential"
+      }
+    },
+    "staging": {
+      "label": "Staging",
+      "kind": "ext",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "A pre-production deploy. It is not a signal itself; it produces the logs, metrics and errors the agent can query."
+      }
+    },
+    "logs": {
+      "label": "Server logs",
+      "kind": "ext",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "Request and application logs from a deploy, queried through a tool.",
+        "example": "500s only when `tax_region` is empty.",
+        "source": "openai-harness"
+      }
+    },
+    "metrics": {
+      "label": "Metrics and traces",
+      "kind": "ext",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "Latency, error rates and traces from a deploy, queried through a tool.",
+        "example": "Checkout p95 latency unchanged.",
+        "source": "openai-harness"
+      }
+    },
+    "errors": {
+      "label": "Error tracking",
+      "kind": "ext",
+      "x": 0,
+      "y": 0,
+      "w": 150,
+      "h": 44,
+      "info": {
+        "summary": "Grouped exceptions with stack traces. Queried through a tool, or an alert can open a task on its own.",
+        "example": "212 events an hour from `InvoiceSerializer`."
+      }
+    }
+  },
+  "edges": [
+    {
+      "from": "human",
+      "to": "task",
+      "label": "assigns"
+    },
+    {
+      "from": "task",
+      "to": "context",
+      "label": "first message"
+    },
+    {
+      "from": "human",
+      "to": "context",
+      "label": "interrupts, comments",
+      "dashed": true
+    },
+    {
+      "from": "memory",
+      "to": "context",
+      "label": "loaded at start"
+    },
+    {
+      "from": "context",
+      "to": "llm",
+      "label": "only input"
+    },
+    {
+      "from": "llm",
+      "to": "loop",
+      "label": "text, tool calls"
+    },
+    {
+      "from": "loop",
+      "to": "context",
+      "label": "builds, compacts"
+    },
+    {
+      "from": "loop",
+      "to": "gate",
+      "label": "each tool call"
+    },
+    {
+      "from": "human",
+      "to": "gate",
+      "label": "approves",
+      "dashed": true
+    },
+    {
+      "from": "gate",
+      "to": "tools",
+      "label": "allowed calls"
+    },
+    {
+      "from": "gate",
+      "to": "context",
+      "label": "denials",
+      "dashed": true
+    },
+    {
+      "from": "tools",
+      "to": "env",
+      "label": "runs in"
+    },
+    {
+      "from": "tools",
+      "to": "context",
+      "label": "results"
+    },
+    {
+      "from": "tools",
+      "to": "memory",
+      "label": "writes notes"
+    },
+    {
+      "from": "tools",
+      "to": "subagent",
+      "label": "spawns"
+    },
+    {
+      "from": "subagent",
+      "to": "context",
+      "label": "summary"
+    },
+    {
+      "from": "env",
+      "to": "codebase",
+      "label": "edits land in"
+    },
+    {
+      "from": "tools",
+      "to": "sensors",
+      "label": "runs"
+    },
+    {
+      "from": "loop",
+      "to": "sensors",
+      "label": "hooks run"
+    },
+    {
+      "from": "codebase",
+      "to": "sensors",
+      "label": "checked"
+    },
+    {
+      "from": "sensors",
+      "to": "context",
+      "label": "results",
+      "feedback": true
+    },
+    {
+      "from": "codebase",
+      "to": "pr",
+      "label": "pushed as"
+    },
+    {
+      "from": "pr",
+      "to": "ci",
+      "label": "triggers"
+    },
+    {
+      "from": "pr",
+      "to": "human",
+      "label": "review"
+    },
+    {
+      "from": "ci",
+      "to": "tools",
+      "label": "logs via CLI"
+    },
+    {
+      "from": "pr",
+      "to": "staging",
+      "label": "deploys on merge"
+    },
+    {
+      "from": "staging",
+      "to": "logs",
+      "label": "emits"
+    },
+    {
+      "from": "staging",
+      "to": "metrics",
+      "label": "emits"
+    },
+    {
+      "from": "staging",
+      "to": "errors",
+      "label": "emits"
+    },
+    {
+      "from": "logs",
+      "to": "tools",
+      "label": "queried"
+    },
+    {
+      "from": "metrics",
+      "to": "tools",
+      "label": "queried"
+    },
+    {
+      "from": "errors",
+      "to": "tools",
+      "label": "queried"
+    },
+    {
+      "from": "errors",
+      "to": "task",
+      "label": "alerts open tasks",
+      "dashed": true
+    },
+    {
+      "from": "codebase",
+      "to": "gc",
+      "label": "scans"
+    },
+    {
+      "from": "gc",
+      "to": "pr",
+      "label": "opens fix PRs"
+    }
+  ],
+  "groups": [
+    {
+      "id": "grp-start",
+      "label": "Start",
+      "members": [
+        "human",
+        "task"
+      ]
+    },
+    {
+      "id": "grp-agent",
+      "label": "Agent",
+      "members": [
+        "grp-sees",
+        "llm",
+        "grp-control",
+        "grp-acts"
+      ]
+    },
+    {
+      "id": "grp-sees",
+      "label": "What the model sees",
+      "members": [
+        "memory",
+        "context"
+      ]
+    },
+    {
+      "id": "grp-control",
+      "label": "Control",
+      "members": [
+        "loop",
+        "gate"
+      ]
+    },
+    {
+      "id": "grp-acts",
+      "label": "Actions",
+      "members": [
+        "tools",
+        "subagent"
+      ]
+    },
+    {
+      "id": "grp-workspace",
+      "label": "Workspace",
+      "members": [
+        "env",
+        "codebase"
+      ]
+    },
+    {
+      "id": "grp-verify",
+      "label": "Verification",
+      "members": [
+        "sensors",
+        "ci"
+      ]
+    },
+    {
+      "id": "grp-delivery",
+      "label": "Delivery",
+      "members": [
+        "gc",
+        "pr"
+      ]
+    },
+    {
+      "id": "grp-deployed",
+      "label": "Deployed systems",
+      "members": [
+        "staging",
+        "logs",
+        "metrics",
+        "errors"
+      ]
+    }
+  ]
+}

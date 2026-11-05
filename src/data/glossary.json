@@ -1,0 +1,166 @@
+{
+  "groups": [
+    {
+      "id": "names",
+      "label": "Names for the practice",
+      "about": "Labels for the work of setting an agent up well. They overlap, and new ones keep appearing."
+    },
+    {
+      "id": "sees",
+      "label": "What the model sees",
+      "about": "Everything that reaches the model goes through its context window."
+    },
+    {
+      "id": "acts",
+      "label": "How the agent acts",
+      "about": "The loop that runs the model's tool calls, and the limits on what they can touch."
+    },
+    {
+      "id": "checks",
+      "label": "What checks the work",
+      "about": "The checks that catch mistakes while the agent is still working."
+    }
+  ],
+  "terms": [
+    {
+      "id": "prompt-engineering",
+      "group": "names",
+      "term": "Prompt engineering",
+      "definition": "Writing the request so the model understands it.",
+      "block": "cx_system"
+    },
+    {
+      "id": "context-engineering",
+      "group": "names",
+      "term": "Context engineering",
+      "definition": "Choosing everything that goes into the context window, not only the prompt.",
+      "block": "context",
+      "source": "anthropic-context"
+    },
+    {
+      "id": "harness-engineering",
+      "group": "names",
+      "term": "Harness engineering",
+      "definition": "A recent name for designing the instructions, checks and limits around an agent.",
+      "block": "loop",
+      "source": "fowler-harness"
+    },
+    {
+      "id": "system-prompt",
+      "group": "sees",
+      "term": "System prompt",
+      "definition": "The built-in instructions that tell the model how to behave and how to use its tools.",
+      "block": "cx_system"
+    },
+    {
+      "id": "context-window",
+      "group": "sees",
+      "term": "Context window",
+      "definition": "Everything the model sees on a turn, and the only thing it sees.",
+      "block": "context",
+      "source": "anthropic-context"
+    },
+    {
+      "id": "agents-md",
+      "group": "sees",
+      "term": "AGENTS.md / CLAUDE.md",
+      "definition": "A file of project instructions the agent reads at the start: how to build, how to test, what to avoid.",
+      "block": "cx_instr",
+      "source": "agents-md"
+    },
+    {
+      "id": "skills",
+      "group": "sees",
+      "term": "Skills",
+      "definition": "Packaged instructions that load in full only when a task needs them.",
+      "block": "cx_skills"
+    },
+    {
+      "id": "memory",
+      "group": "sees",
+      "term": "Memory",
+      "definition": "Notes the agent keeps on disk and loads in later sessions.",
+      "block": "memory",
+      "source": "claude-memory"
+    },
+    {
+      "id": "compaction",
+      "group": "sees",
+      "term": "Compaction",
+      "definition": "Summarizing older turns when the context fills up. It frees space, and can lose detail.",
+      "block": "lp_compact",
+      "source": "anthropic-context"
+    },
+    {
+      "id": "agent-loop",
+      "group": "acts",
+      "term": "Agent loop",
+      "definition": "The runtime that calls the model, runs its tool calls, and feeds the results back until the task is done.",
+      "block": "loop",
+      "source": "anthropic-agents"
+    },
+    {
+      "id": "mcp",
+      "group": "acts",
+      "term": "MCP",
+      "definition": "The Model Context Protocol: an open standard for connecting agents to external tools and data.",
+      "block": "t_mcp",
+      "source": "mcp"
+    },
+    {
+      "id": "subagents",
+      "group": "acts",
+      "term": "Subagents",
+      "definition": "Separate agents with their own context, which return a short summary.",
+      "block": "subagent",
+      "source": "claude-subagents"
+    },
+    {
+      "id": "worktrees",
+      "group": "acts",
+      "term": "Worktrees",
+      "definition": "A separate checkout per task, so agents work in isolation and in parallel.",
+      "block": "e_worktree",
+      "source": "claude-bp"
+    },
+    {
+      "id": "permission-gate",
+      "group": "acts",
+      "term": "Permissions and sandbox",
+      "definition": "Rules on what the agent may run without asking, and limits on what any command can touch.",
+      "block": "gate",
+      "source": "codex-sandbox"
+    },
+    {
+      "id": "guides-sensors",
+      "group": "checks",
+      "term": "Guides and sensors",
+      "definition": "Guides steer the agent before it acts; sensors check its work after. Each is either a deterministic tool or a model.",
+      "block": "sensors",
+      "source": "fowler-harness"
+    },
+    {
+      "id": "hooks",
+      "group": "checks",
+      "term": "Hooks",
+      "definition": "Scripts the agent loop runs on events. They can block a tool call, or feed a check's output back to the model.",
+      "block": "lp_hooks",
+      "source": "claude-hooks"
+    },
+    {
+      "id": "llm-judge",
+      "group": "checks",
+      "term": "LLM as judge",
+      "definition": "A model that checks output against a rubric, for quality that rules cannot measure.",
+      "block": "s_judge"
+    },
+    {
+      "id": "garbage-collection",
+      "group": "checks",
+      "term": "Garbage collection",
+      "definition": "Scheduled agent runs that look for drift and open small fix pull requests.",
+      "block": "gc",
+      "source": "openai-harness"
+    }
+  ]
+}

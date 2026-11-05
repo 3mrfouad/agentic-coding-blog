@@ -1,0 +1,1525 @@
+/* ---------- theme tokens: "The Arctic Engineer", built on the Nord palette (nordtheme.com) ----------
+   Light uses Snow Storm with a deepened Frost accent; dark uses Polar Night with Frost.
+   Accent and failure colours are adjusted from Nord where needed to keep text at 4.5:1 contrast or better. */
+:root,
+html[data-theme="light"] {
+  --bg: #eceff4;
+  --panel: #ffffff;
+  --surface: #e5e9f0;
+  --fg: #2e3440;
+  --muted: #4c566a;
+  --line: #7b88a1;
+  --faint: #c5cdda;
+  --border: #d8dee9;
+  --accent: #456791;
+  --accent-soft: #dce6f1;
+  --fail: #a9454f;
+  --fail-soft: #f5e3e5;
+  --shadow: 0 1px 2px rgba(46, 52, 64, 0.06), 0 8px 24px rgba(46, 52, 64, 0.07);
+  --zone: rgba(94, 129, 172, 0.05);
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --bg: #2e3440;
+  --panel: #3b4252;
+  --surface: #353c4a;
+  --fg: #eceff4;
+  --muted: #b8c1d0;
+  --line: #8d99ae;
+  --faint: #4c566a;
+  --border: #434c5e;
+  --accent: #88c0d0;
+  --accent-soft: #3a4a5b;
+  --fail: #e8a0a6;
+  --fail-soft: #463840;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.28);
+  --zone: rgba(216, 222, 233, 0.035);
+  color-scheme: dark;
+}
+
+/* "system" follows the OS unless a theme is chosen explicitly */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    --bg: #2e3440;
+    --panel: #3b4252;
+    --surface: #353c4a;
+    --fg: #eceff4;
+    --muted: #b8c1d0;
+    --line: #8d99ae;
+    --faint: #4c566a;
+    --border: #434c5e;
+    --accent: #88c0d0;
+    --accent-soft: #3a4a5b;
+    --fail: #e8a0a6;
+    --fail-soft: #463840;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.28);
+    --zone: rgba(216, 222, 233, 0.035);
+    color-scheme: dark;
+  }
+}
+
+/* ---------- page ---------- */
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  height: 100vh;
+}
+
+/* ---------- sidebar ---------- */
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  overflow-y: auto;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.brand p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.theme {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 3px;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.seg {
+  font: inherit;
+  font-size: 12px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+
+.seg:hover { color: var(--fg); }
+
+.seg.on {
+  background: var(--panel);
+  color: var(--fg);
+  box-shadow: var(--shadow);
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tab,
+.btn {
+  font: inherit;
+  font-size: 13px;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: border-color .2s, color .2s, background .2s;
+}
+
+.tab:hover,
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+
+.tab.on {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.btn:disabled { opacity: .35; cursor: default; }
+
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn.small { padding: 5px 12px; font-size: 12px; background: var(--panel); }
+
+.desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.card {
+  padding: 16px 18px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.step-label {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.caption p {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 28px;
+}
+
+.chip {
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--fg);
+}
+
+.chip b {
+  color: var(--accent);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.progress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.progress > div {
+  height: 100%;
+  background: var(--accent);
+  transition: width .4s ease;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+/* ---------- canvas ---------- */
+.canvas {
+  position: relative;
+  min-width: 0;
+  background: var(--bg);
+}
+
+.react-flow {
+  --xy-background-color: var(--bg);
+  --xy-background-pattern-dots-color-default: var(--faint);
+  --xy-minimap-background-color-default: var(--panel);
+  --xy-minimap-mask-background-color-default: color-mix(in srgb, var(--bg) 70%, transparent);
+  --xy-controls-button-background-color-default: var(--panel);
+  --xy-controls-button-background-color-hover-default: var(--surface);
+  --xy-controls-button-color-default: var(--fg);
+  --xy-controls-button-border-color-default: var(--border);
+  font-family: inherit;
+}
+
+.react-flow__attribution { display: none; }
+
+/* handles exist only to anchor edges */
+.hid {
+  opacity: 0 !important;
+  width: 4px !important;
+  height: 4px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  pointer-events: none;
+}
+
+/* blocks: things that are wired together */
+.block {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--fg);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  transition: background .45s ease, border-color .45s ease, color .45s ease, box-shadow .45s ease;
+}
+
+.block.ext {
+  border-style: dashed;
+  border-color: var(--faint);
+  box-shadow: none;
+  font-weight: 500;
+}
+
+.block.gate { border-color: var(--muted); }
+
+/* containers: things made of parts */
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  transition: background .45s ease, border-color .45s ease, box-shadow .45s ease;
+}
+
+.container.gate { border-style: solid; }
+
+.ctitle {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--fg);
+  letter-spacing: -0.005em;
+}
+
+/* parts: what a block is made of */
+.part {
+  width: 172px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background .45s ease, border-color .45s ease, color .45s ease;
+}
+
+/* the LLM */
+.core {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--fg);
+  background: var(--accent-soft);
+  border: 2.5px solid var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 10px 30px rgba(69, 103, 145, 0.18);
+  transition: box-shadow .45s ease;
+}
+
+/* highlight states, shared by every node type */
+.on.block,
+.on.container {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 8px 22px rgba(69, 103, 145, 0.16);
+}
+
+.on.part {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.on.core {
+  box-shadow: 0 0 0 8px var(--accent-soft), 0 10px 30px rgba(69, 103, 145, 0.3);
+}
+
+.fail.block,
+.fail.container,
+.fail.part {
+  background: var(--fail-soft);
+  border-color: var(--fail);
+  color: var(--fail);
+}
+
+/* ---------- legend ---------- */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+.lg {
+  display: inline-block;
+  width: 22px;
+  height: 0;
+  border-top: 2px solid var(--line);
+}
+
+.lg.flow { border-color: var(--accent); }
+.lg.feed { border-top-style: dashed; }
+.lg.madeof { width: 16px; height: 10px; border: 1px solid var(--muted); border-radius: 3px; }
+.lg.ext { width: 16px; height: 10px; border: 1px dashed var(--faint); border-radius: 3px; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: auto 70vh; height: auto; }
+  .side { border-right: 0; border-bottom: 1px solid var(--border); }
+}
+
+/* ---------- labels that fit ---------- */
+.btext { overflow: hidden; text-overflow: ellipsis; }
+
+.part {
+  justify-content: center;
+  padding: 0 6px;
+  font-size: 11px;
+}
+
+.ptext {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- hover card ---------- */
+/* no hover z-index lift: it would paint a container over its own parts */
+
+.pop {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 12px);
+  width: 290px;
+  padding: 14px 16px;
+  background: var(--panel);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  white-space: normal;
+  cursor: default;
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition: opacity .18s ease, transform .18s ease, visibility .18s;
+}
+
+.pop.above {
+  top: auto;
+  bottom: calc(100% + 12px);
+}
+
+/* invisible bridge so the pointer can cross the gap into the card */
+.pop::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -14px;
+  height: 14px;
+}
+
+.pop.above::before {
+  top: auto;
+  bottom: -14px;
+}
+
+.block:hover > .pop,
+.container:hover > .pop,
+.part:hover > .pop,
+.core:hover > .pop {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.pop-title {
+  font-size: 13px;
+  font-weight: 650;
+  margin-bottom: 4px;
+  color: var(--fg);
+}
+
+.pop-summary { margin: 0 0 8px; color: var(--fg); }
+
+.pop-example {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--fg);
+  font-size: 12px;
+}
+
+.pop-example span {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+
+.pop-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.pop-link:hover { text-decoration: underline; }
+
+/* ---------- tap-to-open cards (touch) ---------- */
+.pop.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.pop.open.above { transform: translate(-50%, 0); }
+
+/* ---------- mobile: diagram first, captions and controls below ---------- */
+@media (max-width: 900px) {
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .canvas {
+    order: -1;
+    width: 100%;
+    height: 58vh;
+    min-height: 360px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .side {
+    order: 0;
+    border-right: 0;
+    padding: 18px;
+    overflow: visible;
+  }
+
+  .brand h1 { font-size: 17px; }
+
+  .controls .btn { flex: 1 1 auto; text-align: center; }
+
+  .pop {
+    width: min(290px, 82vw);
+    font-size: 12px;
+  }
+
+  .legend { display: none; }
+}
+
+/* the canvas owns touch gestures, so pan and pinch do not scroll the page */
+.react-flow__renderer,
+.react-flow__pane {
+  touch-action: none;
+}
+
+.panel-actions { display: flex; gap: 6px; }
+
+/* ---------- click-to-open info ---------- */
+.block,
+.part,
+.core {
+  cursor: pointer;
+}
+
+.part:hover,
+.block:hover {
+  border-color: var(--accent);
+}
+
+.part:focus-visible,
+.block:focus-visible,
+.core:focus-visible,
+.info-btn:focus-visible,
+.pop-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.info-btn {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--accent);
+  font: italic 700 12px Georgia, "Times New Roman", serif;
+  cursor: pointer;
+}
+
+.info-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.info-card {
+  z-index: 60;
+}
+
+.pop-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.pop-head .pop-title { margin-bottom: 0; }
+
+.pop-close {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin: -4px -6px 0 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pop-close:hover {
+  color: var(--fg);
+  background: var(--surface);
+}
+
+/* (i) on every parent: blocks and the LLM need a positioning context and room for it */
+.block {
+  position: relative;
+  padding: 0 30px;
+}
+
+.core .info-btn {
+  top: 22px;
+  right: 22px;
+}
+
+/* ---------- parts live inside their container ---------- */
+.container .part {
+  position: absolute;
+  width: 172px;
+  height: 26px;
+  cursor: pointer;
+}
+
+/* a larger invisible hit area, so small parts are easier to tap */
+.container .part::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+}
+
+/* parts read as "made of": a small dot, not a box with weight */
+.container .part::before {
+  content: "";
+  flex: none;
+  width: 5px;
+  height: 5px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--faint);
+}
+
+.container .part.on::before { background: var(--accent); }
+
+.part .ptext {
+  min-width: 0;
+}
+
+.part { font-size: 12px; }
+
+/* state is also shown by shape, not only colour */
+.block.on::before,
+.container.on::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 12%;
+  bottom: 12%;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.fail.block,
+.fail.container,
+.fail.part {
+  border-style: dashed;
+  border-width: 2px;
+}
+
+.fail.part { border-width: 1.5px; }
+
+/* zones */
+.react-flow__node-zone { pointer-events: none; }
+
+.zone {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background: var(--zone);
+  border: 1px dashed var(--faint);
+}
+
+.zlabel {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* (i) buttons on smaller boxes */
+.block .info-btn {
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 8px;
+}
+
+.block { padding: 0 30px; }
+
+/* ---------- sidebar: step list and sources ---------- */
+.intro {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.steps ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.step-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.step-btn:hover { background: var(--surface); color: var(--fg); }
+
+.step-btn.done { color: var(--fg); }
+
+.step-btn.on {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sn {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: 11px;
+}
+
+.st { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.foot {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.foot-h {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.foot-links {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.foot-links a { color: var(--accent); text-decoration: none; }
+.foot-links a:hover { text-decoration: underline; }
+
+/* ---------- readable sizes ---------- */
+.react-flow__edge-text { font-size: 13px; }
+
+/* ---------- reduced motion: stop the flow and the fades ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .react-flow__edge.animated path { animation: none !important; }
+  .flow { animation: none !important; }
+  .block, .container, .part, .core, .zone, .progress > div {
+    transition: none !important;
+  }
+}
+
+/* ---------- focus mode ---------- */
+.zlabel {
+  pointer-events: auto;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.zlabel:hover { color: var(--accent); }
+
+.part.focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  z-index: 2;
+}
+
+.focus-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px 6px 12px;
+  font-size: 13px;
+  color: var(--fg);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+
+.focus-banner b { color: var(--accent); font-weight: 650; }
+
+/* ---------- (i) sits above sub-boxes ---------- */
+.info-btn {
+  z-index: 4;
+}
+
+/* ---------- nested groups: each level a little stronger ---------- */
+.zone.d0 { background: var(--zone); }
+.zone.d1 { background: color-mix(in srgb, var(--zone) 60%, var(--surface)); border-style: solid; }
+.zone.d2 { background: var(--surface); border-style: solid; }
+.zone.on { border-color: var(--accent); }
+
+.zone {
+  position: relative;
+}
+
+/* ---------- edge labels and handles ---------- */
+.edge-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.edge-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 2px solid var(--accent);
+  cursor: grab;
+  pointer-events: all;
+  box-shadow: var(--shadow);
+}
+
+.edge-handle:active { cursor: grabbing; }
+
+.edge-handle.custom { background: var(--accent); }
+
+.edge-handle { touch-action: none; }
+.edge-handle.active { background: var(--accent); cursor: grabbing; }
+
+/* ---------- text fits: wrap to two lines instead of cutting off ---------- */
+.block {
+  line-height: 1.2;
+}
+
+.btext {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.ctitle {
+  max-width: calc(100% - 40px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- (i) sized to its box ---------- */
+.info-btn.xs { width: 14px; height: 14px; font-size: 9px; right: 4px; top: 50%; transform: translateY(-50%); }
+.info-btn.sm { width: 18px; height: 18px; font-size: 10px; right: 6px; top: 50%; transform: translateY(-50%); }
+.info-btn.md { width: 22px; height: 22px; font-size: 12px; }
+.info-btn.lg { width: 26px; height: 26px; font-size: 14px; top: 16px; right: 16px; }
+
+.part { padding-right: 20px; }
+.part .info-btn { position: absolute; }
+.block.sm { padding-right: 26px; padding-left: 26px; }
+
+/* ---------- text: left-aligned with padding; (i) stays on the right ---------- */
+.block {
+  justify-content: flex-start;
+  text-align: left;
+  padding: 0 32px 0 14px;
+}
+
+.block.sm {
+  padding: 0 28px 0 12px;
+}
+
+.btext {
+  text-align: left;
+  width: 100%;
+}
+
+.part {
+  justify-content: flex-start;
+  text-align: left;
+  padding: 0 22px 0 10px;
+}
+
+.container .ctitle {
+  left: 16px;
+}
+
+/* ---------- header rows: [title ........ (i)] ---------- */
+/* blocks: label on the left, (i) on the right, one row */
+.block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 10px 0 14px;
+  text-align: left;
+}
+
+.block .btext {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+}
+
+.block .info-btn,
+.chead .info-btn,
+.part .info-btn {
+  position: static;
+  transform: none;
+  flex: none;
+  margin: 0;
+}
+
+/* containers: a header row across the top */
+.chead {
+  position: absolute;
+  top: 8px;
+  left: 14px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chead .ctitle {
+  position: static;
+  max-width: none;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* parts: label on the left, (i) on the right */
+.container .part {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 4px 0 10px;
+}
+
+.part .ptext {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+}
+
+.block.sm { padding: 0 8px 0 12px; }
+
+/* the minimap covers too much of a phone screen */
+@media (max-width: 900px) {
+  .react-flow__minimap { display: none; }
+}
+
+/* ---------- guide / sensor tags (Fowler) ---------- */
+.role {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  font: 700 9px/1 system-ui, sans-serif;
+  font-style: normal;
+  color: var(--fg);
+  border: 1px solid var(--muted);
+}
+
+/* computational = solid, inferential = dashed: shape carries the meaning, not only colour */
+.role.inferential { border-style: dashed; }
+.role.guide { background: var(--surface); }
+.role.sensor { background: var(--panel); border-radius: 50%; }
+
+.part .role { margin-right: 2px; }
+.container .part.has-role::before { display: none; }
+
+.block .role { margin-right: -2px; }
+
+.pop-role {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+.legend .role { margin-right: 2px; }
+
+/* ---------- legend in the sidebar ---------- */
+.side-legend .legend {
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+  gap: 8px 14px;
+}
+
+@media (max-width: 900px) {
+  .side-legend .legend { display: flex; }
+}
+
+/* ---------- follow steps switch ---------- */
+.follow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.follow input { accent-color: var(--accent); width: 15px; height: 15px; margin: 0; }
+.follow small { color: var(--muted); font-size: 12px; }
+
+/* ---------- player: scenario menu and controls in a fixed spot ---------- */
+.player {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+}
+
+.scenario {
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scenario select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  padding: 9px 36px 9px 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--fg);
+  background-color: var(--panel);
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 55%, calc(100% - 13px) 55%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.scenario select:hover { border-color: var(--accent); }
+.scenario select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.player .controls {
+  margin-top: 0;
+  flex-wrap: nowrap;
+}
+
+.player .controls .btn { flex: 1 1 0; text-align: center; padding: 6px 8px; }
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-row .progress { flex: 1 1 auto; }
+
+.step-count {
+  flex: none;
+  min-width: 44px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* the caption keeps a steady height so the step list below does not jump either */
+.caption { min-height: 132px; }
+.chips { min-height: 58px; align-content: flex-start; }
+
+/* ---------- popover source ---------- */
+.pop-link {
+  display: grid;
+  gap: 1px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  text-decoration: none;
+}
+
+.pop-link-pub {
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pop-link-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1.35;
+}
+
+.pop-link:hover .pop-link-title { text-decoration: underline; }
+
+/* ---------- further reading ---------- */
+.reading {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.reading-group + .reading-group { margin-top: 14px; }
+
+.reading-group-h {
+  margin: 10px 0 6px;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--fg);
+}
+
+.reading ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.reading a {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  margin: 0 -10px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--fg);
+  transition: background .15s;
+}
+
+.reading a:hover { background: var(--surface); }
+.reading a:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
+
+.r-pub {
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.r-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--accent);
+}
+
+.r-about {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* reading list stays inside the sidebar: no negative margins, long words wrap */
+.reading a {
+  margin: 0;
+  padding: 8px 10px;
+  min-width: 0;
+}
+
+.reading ul { margin: 0 -10px; }
+
+.r-title,
+.r-about {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.side { overflow-x: hidden; }
+
+/* ---------- code in text ---------- */
+code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .92em;
+  white-space: nowrap;
+  padding: 0 .3em;
+  border-radius: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.pop-example code,
+.chip code { background: color-mix(in srgb, var(--panel) 60%, transparent); }
+
+/* ---------- header with the reading button ---------- */
+.brand-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.reading-open { flex: none; margin-top: 1px; }
+
+/* ---------- player: description sits under the controls ---------- */
+.player .desc {
+  margin: 2px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 12.5px;
+}
+
+/* ---------- further reading panel ---------- */
+.reading-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: flex-start;
+  background: color-mix(in srgb, var(--bg) 40%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+.reading-panel {
+  width: min(440px, 100vw);
+  height: 100%;
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.reading-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reading-head h2 { margin: 0; font-size: 18px; font-weight: 650; }
+
+.reading-intro { margin: 6px 0 4px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+.reading-panel .reading {
+  margin-top: 0;
+  padding-top: 6px;
+  border-top: 0;
+}
+
+/* ---------- tidy button inside the zoom controls ---------- */
+.react-flow__controls-button svg rect {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+}
+
+/* ---------- touch screens: bigger targets ---------- */
+@media (pointer: coarse) {
+  .container .part::after { inset: -9px -4px; }
+  .block .info-btn, .chead .info-btn, .part .info-btn { position: relative; top: auto; right: auto; transform: none; }
+  .info-btn::after { content: ""; position: absolute; inset: -12px; }
+  .btn, .seg, .step-btn { min-height: 44px; }
+  .follow input { width: 20px; height: 20px; }
+}
+
+/* line labels sit above boxes, so a highlighted box's glow cannot cover them */
+.react-flow__edgelabel-renderer { z-index: 6; }
+
+/* ---------- resize grip: only on hover, or on the focused box with touch ---------- */
+.react-flow__resize-control.resize-grip {
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: 5;
+}
+
+.react-flow__node:hover .resize-grip,
+.react-flow__node:focus-within .resize-grip,
+.react-flow__resize-control.resize-grip:hover { opacity: 1; }
+
+.grip-mark {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 10px;
+  height: 10px;
+  cursor: nwse-resize;
+}
+
+.grip-mark svg { width: 10px; height: 10px; display: block; }
+.grip-mark path { stroke: var(--muted); stroke-width: 1.4; stroke-linecap: round; fill: none; }
+.resize-grip:hover .grip-mark path { stroke: var(--accent); }
+
+/* the LLM circle: grip sits on the circle's lower right */
+.react-flow__node-core .resize-grip { transform: translate(-22%, -22%); }
+
+/* ---------- line grips: one per segment, only on the hovered line ---------- */
+.edge-grip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--panel) 70%, transparent);
+  pointer-events: all;
+  touch-action: none;
+  z-index: 7;
+}
+
+.edge-grip.ns { cursor: ns-resize; }
+.edge-grip.ew { cursor: ew-resize; }
+.edge-grip:hover, .edge-grip:active { background: var(--accent); }
+
+.edit-hint {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+@media (hover: none) {
+  /* no hover on touch: the grip shows on the box you tapped */
+  .react-flow__node.is-focus .resize-grip { opacity: 1; }
+  .edge-grip { width: 18px; height: 18px; }
+}
+
+/* grips catch the pointer only on the hovered box, and only when zoomed in enough to edit */
+.react-flow__resize-control.resize-grip { pointer-events: none; }
+.react-flow__node:hover .resize-grip,
+.react-flow__node.is-focus .resize-grip { pointer-events: all; }
+.canvas[data-zoom="far"] .resize-grip,
+.canvas[data-zoom="far"] .edge-grip { display: none; }
+
+/* ---------- line ends: a square grip at each end, snap targets while dragging ---------- */
+.end-grip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: var(--panel);
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--panel) 70%, transparent);
+  cursor: grab;
+  pointer-events: all;
+  touch-action: none;
+  z-index: 8;
+}
+
+.end-grip:active { cursor: grabbing; }
+.end-grip:hover, .end-grip.custom { background: var(--accent); }
+
+.anchor-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--accent);
+  background: transparent;
+  pointer-events: none;
+  z-index: 7;
+}
+
+.canvas[data-zoom="far"] .end-grip,
+.canvas[data-zoom="far"] .anchor-dot { display: none; }
+
+@media (hover: none) {
+  .end-grip { width: 16px; height: 16px; }
+}
+
+/* sidebar sections keep their full height; the sidebar scrolls instead of squeezing them */
+.side > * { flex-shrink: 0; }
+
+/* dark mode: the accent button is light, so its text is dark (white would be about 3:1 contrast) */
+html[data-theme="dark"] .btn.primary,
+html[data-theme="dark"] .site .btn.primary { color: #2e3440; }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .btn.primary,
+  html:not([data-theme="light"]) .site .btn.primary { color: #2e3440; }
+}

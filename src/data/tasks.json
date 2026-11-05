@@ -1,0 +1,1088 @@
+{
+  "version": 2,
+  "tasks": [
+    {
+      "name": "Fix a crash",
+      "description": "Issue #482: the profile page throws for users who signed up through SSO and have no email. TypeScript, React, pnpm.",
+      "steps": [
+        {
+          "text": "Issue #482 is assigned: the profile page crashes for SSO users with no email.",
+          "act": [
+            "human",
+            "task"
+          ],
+          "annotations": {
+            "task": "#482: TypeError at `ProfileCard.tsx:42`"
+          },
+          "fail": null
+        },
+        {
+          "text": "The session starts in a fresh worktree on its own branch, and dependencies are installed.",
+          "act": [
+            "loop",
+            "env",
+            "e_worktree",
+            "e_branch",
+            "e_deps",
+            "e_image"
+          ],
+          "annotations": {
+            "e_branch": "`fix/482-profile-null-email`",
+            "e_worktree": "../wt-482",
+            "e_deps": "`pnpm install`, from cache"
+          },
+          "fail": null
+        },
+        {
+          "text": "The agent loop builds the first context: system prompt, tool definitions, `AGENTS.md`, memory notes, and the issue as the first message.",
+          "act": [
+            "loop",
+            "lp_assemble",
+            "context",
+            "cx_system",
+            "cx_tooldefs",
+            "cx_instr",
+            "cx_history",
+            "memory",
+            "task"
+          ],
+          "annotations": {
+            "cx_instr": "`pnpm test`; no new dependencies",
+            "memory": "Profile tests live in `src/profile/`"
+          },
+          "fail": null
+        },
+        {
+          "text": "The model reads the context and replies with two tool calls. It runs nothing itself.",
+          "act": [
+            "context",
+            "llm",
+            "loop"
+          ],
+          "annotations": {
+            "llm": "read `ProfileCard.tsx`; `grep email.domain`"
+          },
+          "fail": null
+        },
+        {
+          "text": "Each call passes the permission gate. Reads and searches are allowed by rule, so they run at once.",
+          "act": [
+            "loop",
+            "gate",
+            "g_rules",
+            "tools",
+            "t_read",
+            "t_search",
+            "env"
+          ],
+          "annotations": {
+            "g_rules": "read, `grep`: allow"
+          },
+          "fail": null
+        },
+        {
+          "text": "The results are appended to the context window: three callers of `formatEmailDomain()`.",
+          "act": [
+            "tools",
+            "t_search",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "cx_results": "`grep`: 3 callers of `formatEmailDomain()`"
+          },
+          "fail": null
+        },
+        {
+          "text": "The agent spawns a subagent to search the admin area. It works in its own context and returns a summary.",
+          "act": [
+            "llm",
+            "loop",
+            "tools",
+            "t_subagent",
+            "subagent",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "subagent": "No other callers in `src/admin/`"
+          },
+          "fail": null
+        },
+        {
+          "text": "The model writes a plan to the todo list, so the human can follow along.",
+          "act": [
+            "llm",
+            "loop",
+            "lp_todo"
+          ],
+          "annotations": {
+            "lp_todo": "1. null-safe helper  2. hide row  3. test"
+          },
+          "fail": null
+        },
+        {
+          "text": "A checkpoint is taken, then the edits are written into the worktree.",
+          "act": [
+            "loop",
+            "lp_checkpoint",
+            "gate",
+            "tools",
+            "t_edit",
+            "env",
+            "codebase"
+          ],
+          "annotations": {
+            "lp_checkpoint": "snapshot before edits",
+            "t_edit": "3 files changed"
+          },
+          "fail": null
+        },
+        {
+          "text": "A hook runs the type check after the edit. It fails, and the error goes back into the context window.",
+          "act": [
+            "loop",
+            "lp_hooks",
+            "sensors",
+            "s_types",
+            "codebase",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "lp_hooks": "after edit: `tsc --noEmit`",
+            "s_types": "`UserTable.tsx:88`: string expected"
+          },
+          "fail": "s_types"
+        },
+        {
+          "text": "The subagent missed a caller. A wider search finds it, and the agent handles null in the admin table.",
+          "act": [
+            "llm",
+            "tools",
+            "t_search",
+            "t_edit",
+            "env",
+            "codebase",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "t_search": "`grep formatEmailDomain`: 4 hits"
+          },
+          "fail": null
+        },
+        {
+          "text": "The agent runs the test suite through the shell, then a browser smoke test of `/profile` against the dev server. Everything passes.",
+          "act": [
+            "tools",
+            "t_shell",
+            "sensors",
+            "s_tests",
+            "s_lint",
+            "s_types",
+            "codebase",
+            "context",
+            "env",
+            "e_devserver"
+          ],
+          "annotations": {
+            "s_tests": "214 passed",
+            "e_devserver": "Smoke test: `/profile` renders"
+          },
+          "fail": null
+        },
+        {
+          "text": "Pushing needs approval. The gate pauses the call until the human approves it.",
+          "act": [
+            "loop",
+            "gate",
+            "g_ask",
+            "human",
+            "tools",
+            "t_shell"
+          ],
+          "annotations": {
+            "g_ask": "`git push origin fix/482`: approve?",
+            "human": "Approved"
+          },
+          "fail": null
+        },
+        {
+          "text": "The branch is pushed and a pull request opened. CI fails on Node 20, which the local container never ran.",
+          "act": [
+            "codebase",
+            "pr",
+            "ci"
+          ],
+          "annotations": {
+            "pr": "PR #519",
+            "ci": "Fails on Node 20 only"
+          },
+          "fail": "ci"
+        },
+        {
+          "text": "The agent reads the failing CI log through the GitHub CLI and pins the runner to Node 22.",
+          "act": [
+            "ci",
+            "tools",
+            "t_shell",
+            "t_edit",
+            "context",
+            "cx_results",
+            "codebase"
+          ],
+          "annotations": {
+            "t_shell": "`gh run view --log-failed`",
+            "cx_results": "runner: `node 20.11`"
+          },
+          "fail": null
+        },
+        {
+          "text": "The human reviews the PR and asks for different copy. The comment arrives as a new message in the context.",
+          "act": [
+            "pr",
+            "human",
+            "context",
+            "cx_history",
+            "llm"
+          ],
+          "annotations": {
+            "human": "Use \"No email on file\""
+          },
+          "fail": null
+        },
+        {
+          "text": "The agent saves a memory note, so future sessions reuse the same copy.",
+          "act": [
+            "llm",
+            "tools",
+            "t_edit",
+            "memory"
+          ],
+          "annotations": {
+            "memory": "Empty email: \"No email on file\""
+          },
+          "fail": null
+        },
+        {
+          "text": "After merge, the fix deploys to staging. The agent queries error tracking through an MCP tool.",
+          "act": [
+            "pr",
+            "staging",
+            "errors",
+            "logs",
+            "tools",
+            "t_mcp",
+            "context"
+          ],
+          "annotations": {
+            "errors": "0 new issues in 30 min",
+            "t_mcp": "Sentry: issues since deploy"
+          },
+          "fail": null
+        },
+        {
+          "text": "Every todo is done, so the stop condition ends the loop. The worktree and branch are cleaned up.",
+          "act": [
+            "loop",
+            "lp_stop",
+            "env",
+            "e_worktree",
+            "e_branch"
+          ],
+          "annotations": {
+            "lp_stop": "Done: all todos complete"
+          },
+          "fail": null
+        }
+      ]
+    },
+    {
+      "name": "Add a feature",
+      "description": "Ticket #611: filtered orders must export to CSV, one row per line item, for month-end tax reconciliation.",
+      "steps": [
+        {
+          "text": "Ticket #611: export filtered orders to CSV, one row per line item.",
+          "act": [
+            "human",
+            "task"
+          ],
+          "annotations": {
+            "task": "#611: orders CSV export"
+          },
+          "fail": null
+        },
+        {
+          "text": "A fresh worktree is prepared and the first context built. The ticket matches a skill, so its instructions load too.",
+          "act": [
+            "loop",
+            "env",
+            "e_worktree",
+            "e_branch",
+            "e_deps",
+            "lp_assemble",
+            "context",
+            "cx_system",
+            "cx_instr",
+            "cx_skills",
+            "cx_tooldefs",
+            "memory",
+            "task"
+          ],
+          "annotations": {
+            "e_branch": "`feat/611-orders-csv`",
+            "cx_skills": "`add-export-route`",
+            "cx_instr": "Next.js: server code stays in server/"
+          },
+          "fail": null
+        },
+        {
+          "text": "The model asks the language server for the existing export helper and reads it.",
+          "act": [
+            "llm",
+            "loop",
+            "gate",
+            "tools",
+            "t_lsp",
+            "t_read",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "t_lsp": "definition: `server/exports.ts`"
+          },
+          "fail": null
+        },
+        {
+          "text": "It writes a plan to the todo list.",
+          "act": [
+            "llm",
+            "loop",
+            "lp_todo"
+          ],
+          "annotations": {
+            "lp_todo": "1. route  2. button  3. tests"
+          },
+          "fail": null
+        },
+        {
+          "text": "A checkpoint is taken, then the route, button and row flattener are written.",
+          "act": [
+            "loop",
+            "lp_checkpoint",
+            "tools",
+            "t_edit",
+            "env",
+            "codebase"
+          ],
+          "annotations": {
+            "lp_checkpoint": "snapshot before edits"
+          },
+          "fail": null
+        },
+        {
+          "text": "A hook runs the architecture check. The page imports server code, which the rules forbid.",
+          "act": [
+            "loop",
+            "lp_hooks",
+            "sensors",
+            "s_arch",
+            "codebase",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "s_arch": "client imports `server/exports.ts`"
+          },
+          "fail": "s_arch"
+        },
+        {
+          "text": "The agent rewinds to the checkpoint and moves the CSV writer into a shared module.",
+          "act": [
+            "loop",
+            "lp_checkpoint",
+            "tools",
+            "t_edit",
+            "codebase"
+          ],
+          "annotations": {
+            "lp_checkpoint": "rewound",
+            "t_edit": "`shared/csv.ts`"
+          },
+          "fail": null
+        },
+        {
+          "text": "Tests and checks pass when run through the shell.",
+          "act": [
+            "tools",
+            "t_shell",
+            "sensors",
+            "s_tests",
+            "s_types",
+            "s_arch",
+            "context"
+          ],
+          "annotations": {
+            "s_tests": "3 unit + 1 route test pass"
+          },
+          "fail": null
+        },
+        {
+          "text": "A review agent reads the diff and finds nothing wrong.",
+          "act": [
+            "sensors",
+            "s_review",
+            "context"
+          ],
+          "annotations": {
+            "s_review": "No issues found"
+          },
+          "fail": null
+        },
+        {
+          "text": "Push is approved and the PR opened. CI passes on the first run.",
+          "act": [
+            "gate",
+            "g_ask",
+            "human",
+            "codebase",
+            "pr",
+            "ci"
+          ],
+          "annotations": {
+            "ci": "Green on first run"
+          },
+          "fail": null
+        },
+        {
+          "text": "On staging, the human opens the export in Excel. The currency column is missing, which the review agent did not catch.",
+          "act": [
+            "pr",
+            "staging",
+            "human",
+            "context",
+            "cx_history"
+          ],
+          "annotations": {
+            "human": "Excel: no currency column"
+          },
+          "fail": null
+        },
+        {
+          "text": "The agent adds the column. The todo list is complete, so the loop stops.",
+          "act": [
+            "llm",
+            "tools",
+            "t_edit",
+            "codebase",
+            "loop",
+            "lp_stop"
+          ],
+          "annotations": {
+            "lp_stop": "Done"
+          },
+          "fail": null
+        },
+        {
+          "text": "Later, a scheduled garbage-collection run finds an unused import and opens a small fix PR.",
+          "act": [
+            "codebase",
+            "gc",
+            "pr"
+          ],
+          "annotations": {
+            "gc": "Fix PR: remove unused import"
+          },
+          "fail": null
+        }
+      ]
+    },
+    {
+      "name": "Production alert",
+      "description": "Error tracking alerts on a spike of 500s from `/api/invoices` after this morning's deploy. The alert itself opens the task.",
+      "steps": [
+        {
+          "text": "Error tracking sees a spike of 500s from `/api/invoices` after this morning's deploy, and the alert opens a task on its own.",
+          "act": [
+            "errors",
+            "task"
+          ],
+          "annotations": {
+            "errors": "212 events/hour: `InvoiceSerializer`",
+            "task": "Opened from the alert"
+          },
+          "fail": null
+        },
+        {
+          "text": "A human checks the task and assigns it to the agent.",
+          "act": [
+            "human",
+            "task"
+          ],
+          "annotations": {
+            "human": "Assigned to the agent"
+          },
+          "fail": null
+        },
+        {
+          "text": "A fresh worktree is prepared, and the first context opens with the alert payload as its first message.",
+          "act": [
+            "loop",
+            "env",
+            "e_worktree",
+            "e_branch",
+            "e_deps",
+            "lp_assemble",
+            "context",
+            "cx_system",
+            "cx_tooldefs",
+            "cx_instr",
+            "cx_history",
+            "task"
+          ],
+          "annotations": {
+            "e_branch": "`fix/invoice-500s`",
+            "cx_history": "Alert payload as the first message"
+          },
+          "fail": null
+        },
+        {
+          "text": "The model queries error tracking through an MCP tool for the stack trace and the release where it started.",
+          "act": [
+            "llm",
+            "loop",
+            "gate",
+            "g_rules",
+            "tools",
+            "t_mcp",
+            "errors",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "t_mcp": "Sentry: events for issue INV-91",
+            "cx_results": "First seen in release 2026.11.03-2"
+          },
+          "fail": null
+        },
+        {
+          "text": "It queries logs and metrics too. Every failing request is an invoice with no tax region.",
+          "act": [
+            "tools",
+            "t_mcp",
+            "logs",
+            "metrics",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "logs": "500s only when `tax_region` is empty",
+            "metrics": "Error rate 4%, latency flat"
+          },
+          "fail": null
+        },
+        {
+          "text": "It reads the release diff through `git` to find what changed.",
+          "act": [
+            "llm",
+            "tools",
+            "t_shell",
+            "codebase",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "t_shell": "`git log 2026.11.03-1..2026.11.03-2`"
+          },
+          "fail": null
+        },
+        {
+          "text": "It writes a test that reproduces the crash. The test fails, as it should.",
+          "act": [
+            "tools",
+            "t_edit",
+            "t_shell",
+            "codebase",
+            "sensors",
+            "s_tests",
+            "context"
+          ],
+          "annotations": {
+            "s_tests": "Reproduced: `KeyError 'tax_region'`"
+          },
+          "fail": "s_tests"
+        },
+        {
+          "text": "It fixes the serializer. The new test and the full suite pass.",
+          "act": [
+            "llm",
+            "tools",
+            "t_edit",
+            "t_shell",
+            "codebase",
+            "sensors",
+            "s_tests",
+            "s_types",
+            "context"
+          ],
+          "annotations": {
+            "s_tests": "Repro passes; 1,102 passed"
+          },
+          "fail": null
+        },
+        {
+          "text": "Push is approved, the PR opened, and CI passes.",
+          "act": [
+            "gate",
+            "g_ask",
+            "human",
+            "codebase",
+            "pr",
+            "ci"
+          ],
+          "annotations": {
+            "ci": "Green"
+          },
+          "fail": null
+        },
+        {
+          "text": "The human reviews and merges. The fix deploys to staging.",
+          "act": [
+            "pr",
+            "human",
+            "staging"
+          ],
+          "annotations": {
+            "human": "Approved and merged"
+          },
+          "fail": null
+        },
+        {
+          "text": "The agent watches error tracking after the deploy. The errors stop.",
+          "act": [
+            "staging",
+            "errors",
+            "tools",
+            "t_mcp",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "errors": "0 new events in 45 min"
+          },
+          "fail": null
+        },
+        {
+          "text": "The error rate is back to normal, so the loop stops.",
+          "act": [
+            "loop",
+            "lp_stop"
+          ],
+          "annotations": {
+            "lp_stop": "Done: errors back to baseline"
+          },
+          "fail": null
+        }
+      ]
+    },
+    {
+      "name": "Security finding",
+      "description": "Semgrep in CI flags a SQL query built by string concatenation. The session runs with the network switched off.",
+      "steps": [
+        {
+          "text": "Semgrep in CI flags a SQL query built by string concatenation. A human turns the finding into a task.",
+          "act": [
+            "ci",
+            "human",
+            "task"
+          ],
+          "annotations": {
+            "task": "Semgrep: `sql-injection` in `reports.py:57`"
+          },
+          "fail": null
+        },
+        {
+          "text": "The worktree is prepared with the network switched off by the sandbox, and the first context includes the project's rule for database access.",
+          "act": [
+            "loop",
+            "env",
+            "e_worktree",
+            "e_branch",
+            "e_sandbox",
+            "lp_assemble",
+            "context",
+            "cx_instr",
+            "cx_system",
+            "cx_tooldefs",
+            "task"
+          ],
+          "annotations": {
+            "e_sandbox": "Network off; writes only in the worktree",
+            "cx_instr": "Use the query builder; never format SQL strings"
+          },
+          "fail": null
+        },
+        {
+          "text": "The agent runs Semgrep locally to see every finding, not only the one CI reported.",
+          "act": [
+            "llm",
+            "tools",
+            "t_shell",
+            "sensors",
+            "s_semgrep",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "s_semgrep": "3 findings: reports, export, admin"
+          },
+          "fail": "s_semgrep"
+        },
+        {
+          "text": "It tries to fetch the ORM docs. Network access is denied in this session, and the denial comes back as a tool result.",
+          "act": [
+            "llm",
+            "loop",
+            "gate",
+            "g_rules",
+            "tools",
+            "t_web",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "g_rules": "web fetch: deny",
+            "cx_results": "Denied: network is off"
+          },
+          "fail": null
+        },
+        {
+          "text": "Instead it searches the codebase for how the query builder is already used.",
+          "act": [
+            "llm",
+            "tools",
+            "t_search",
+            "t_read",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "t_search": "`grep 'qb.select('`: 41 uses"
+          },
+          "fail": null
+        },
+        {
+          "text": "A codemod rewrites all three call sites the same way.",
+          "act": [
+            "tools",
+            "t_codemod",
+            "env",
+            "codebase"
+          ],
+          "annotations": {
+            "t_codemod": "string SQL to `qb.select()` in 3 files"
+          },
+          "fail": null
+        },
+        {
+          "text": "Semgrep is clean and the tests pass.",
+          "act": [
+            "tools",
+            "t_shell",
+            "sensors",
+            "s_semgrep",
+            "s_tests",
+            "s_types",
+            "context"
+          ],
+          "annotations": {
+            "s_semgrep": "0 findings"
+          },
+          "fail": null
+        },
+        {
+          "text": "A review agent asks for a test that sends a quote character through the filter.",
+          "act": [
+            "sensors",
+            "s_review",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "s_review": "Add a test with a quote in the filter"
+          },
+          "fail": null
+        },
+        {
+          "text": "The agent adds the test. It passes.",
+          "act": [
+            "llm",
+            "tools",
+            "t_edit",
+            "t_shell",
+            "codebase",
+            "sensors",
+            "s_tests"
+          ],
+          "annotations": {
+            "s_tests": "Injection test passes"
+          },
+          "fail": null
+        },
+        {
+          "text": "An LLM judge checks that the PR description matches the diff.",
+          "act": [
+            "sensors",
+            "s_judge",
+            "context"
+          ],
+          "annotations": {
+            "s_judge": "Matches: 3 files, no behaviour change"
+          },
+          "fail": null
+        },
+        {
+          "text": "Push is approved, the PR opened, and CI is clean.",
+          "act": [
+            "gate",
+            "g_ask",
+            "human",
+            "codebase",
+            "pr",
+            "ci"
+          ],
+          "annotations": {
+            "ci": "Semgrep clean in CI"
+          },
+          "fail": null
+        },
+        {
+          "text": "The human reviews and approves, so the loop stops.",
+          "act": [
+            "pr",
+            "human",
+            "loop",
+            "lp_stop"
+          ],
+          "annotations": {
+            "lp_stop": "Done"
+          },
+          "fail": null
+        }
+      ]
+    },
+    {
+      "name": "Dependency upgrade",
+      "description": "Upgrade the date library from v2 to v3 across the monorepo. A breaking change sends the agent into its retry limit, so it stops and asks.",
+      "steps": [
+        {
+          "text": "Ticket #702: upgrade the date library from v2 to v3 across the monorepo.",
+          "act": [
+            "human",
+            "task"
+          ],
+          "annotations": {
+            "task": "#702: date-lib v2 to v3"
+          },
+          "fail": null
+        },
+        {
+          "text": "A worktree is prepared with the new version installed, and the first context includes a memory note from the last upgrade.",
+          "act": [
+            "loop",
+            "env",
+            "e_worktree",
+            "e_branch",
+            "e_image",
+            "e_deps",
+            "lp_assemble",
+            "context",
+            "cx_instr",
+            "cx_history",
+            "memory",
+            "task"
+          ],
+          "annotations": {
+            "e_deps": "date-lib 3.0.0",
+            "memory": "Timezone tests were flaky last time"
+          },
+          "fail": null
+        },
+        {
+          "text": "The agent fetches the v3 migration guide. Web access is allowed in this session.",
+          "act": [
+            "llm",
+            "gate",
+            "g_rules",
+            "tools",
+            "t_web",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "t_web": "date-lib v3 migration guide",
+            "cx_results": "`format()` renamed to `formatDate()`"
+          },
+          "fail": null
+        },
+        {
+          "text": "It plans the upgrade on the todo list.",
+          "act": [
+            "llm",
+            "loop",
+            "lp_todo"
+          ],
+          "annotations": {
+            "lp_todo": "1. codemod  2. types  3. tests"
+          },
+          "fail": null
+        },
+        {
+          "text": "A checkpoint is taken, then a codemod renames the call across the repo.",
+          "act": [
+            "loop",
+            "lp_checkpoint",
+            "tools",
+            "t_codemod",
+            "env",
+            "codebase"
+          ],
+          "annotations": {
+            "t_codemod": "format to formatDate in 63 files"
+          },
+          "fail": null
+        },
+        {
+          "text": "Types pass, but 18 tests fail: v3 reads two-digit years differently.",
+          "act": [
+            "tools",
+            "t_shell",
+            "sensors",
+            "s_types",
+            "s_tests",
+            "context",
+            "cx_results"
+          ],
+          "annotations": {
+            "s_tests": "18 failures: '70' parses as 2070"
+          },
+          "fail": "s_tests"
+        },
+        {
+          "text": "Its first fix helps, but tests still fail.",
+          "act": [
+            "llm",
+            "tools",
+            "t_edit",
+            "t_shell",
+            "sensors",
+            "s_tests",
+            "context"
+          ],
+          "annotations": {
+            "s_tests": "Retry 1 of 3: 11 failures"
+          },
+          "fail": "s_tests"
+        },
+        {
+          "text": "The context is filling up with the large diff, so compaction summarizes it.",
+          "act": [
+            "loop",
+            "lp_compact",
+            "context",
+            "cx_history"
+          ],
+          "annotations": {
+            "lp_compact": "63-file diff summarized"
+          },
+          "fail": null
+        },
+        {
+          "text": "Two more attempts still leave failures.",
+          "act": [
+            "llm",
+            "tools",
+            "t_edit",
+            "t_shell",
+            "sensors",
+            "s_tests",
+            "context"
+          ],
+          "annotations": {
+            "s_tests": "Retry 3 of 3: 4 failures"
+          },
+          "fail": "s_tests"
+        },
+        {
+          "text": "The retry limit is reached. The agent stops and reports back instead of guessing further.",
+          "act": [
+            "loop",
+            "lp_stop",
+            "human",
+            "context"
+          ],
+          "annotations": {
+            "lp_stop": "Retry limit: stop and report",
+            "human": "4 tests rely on the old two-digit-year rule"
+          },
+          "fail": null
+        },
+        {
+          "text": "The human decides the rule, and the answer arrives as a new message.",
+          "act": [
+            "human",
+            "context",
+            "cx_history",
+            "llm"
+          ],
+          "annotations": {
+            "human": "Years 70 to 99 mean 19xx"
+          },
+          "fail": null
+        },
+        {
+          "text": "The agent sets the parse option. Every test passes.",
+          "act": [
+            "llm",
+            "tools",
+            "t_edit",
+            "t_shell",
+            "codebase",
+            "sensors",
+            "s_tests"
+          ],
+          "annotations": {
+            "s_tests": "2,310 passed"
+          },
+          "fail": null
+        },
+        {
+          "text": "Push is approved and CI runs both Node versions. Both pass.",
+          "act": [
+            "gate",
+            "g_ask",
+            "human",
+            "pr",
+            "ci"
+          ],
+          "annotations": {
+            "ci": "Node 20 and 22: green"
+          },
+          "fail": null
+        },
+        {
+          "text": "The todo list is complete, so the loop stops.",
+          "act": [
+            "loop",
+            "lp_stop"
+          ],
+          "annotations": {
+            "lp_stop": "Done"
+          },
+          "fail": null
+        }
+      ]
+    }
+  ]
+}
