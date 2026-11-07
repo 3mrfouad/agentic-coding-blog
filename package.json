@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.4.0"
+    "vite": "^6.4.5"
   },
   "description": "An interactive map of how a coding agent works: the model, its harness, and how a real task moves through them.",
   "license": "MIT",
