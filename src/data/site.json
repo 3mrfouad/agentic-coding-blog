@@ -1,9 +1,9 @@
 {
   "title": "Coding agent architecture",
   "tagline": "See how a coding agent is built, so you can help it do better work.",
-  "repoUrl": "https://github.com/YOUR-GITHUB-USER/agenticcodingblog",
+  "repoUrl": "https://github.com/3mrfouad/agentic-coding-blog",
   "license": "MIT",
-  "storyUrl": "https://YOUR-SUBSTACK.substack.com/p/YOUR-ARTICLE",
+  "storyUrl": "https://amrfouad.substack.com/p/getting-out-of-the-loop",
   "storyLabel": "Read the full story on Substack",
   "url": "https://agenticcoding.blog"
 }
